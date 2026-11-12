@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f3ed">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; font-src 'none'; media-src 'none';">
+  <title>SAMENWIJS</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #f5f3ed;
+      --surface: #ffffff;
+      --ink: #20312d;
+      --muted: #4d5d57;
+      --green: #286457;
+      --green-dark: #164b40;
+      --soft: #eaf1ec;
+      --line: #c9d7cf;
+      --focus: #174fdf;
+      --scale: 1;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-size: calc(18px * var(--scale));
+      line-height: 1.55;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body.high-contrast {
+      --page: #fff;
+      --surface: #fff;
+      --ink: #101010;
+      --muted: #222;
+      --green: #00473b;
+      --green-dark: #00382f;
+      --soft: #e9f4f0;
+      --line: #202020;
+      --focus: #003cff;
+    }
+    body.dark-mode:not(.high-contrast) {
+      --page: #17221f;
+      --surface: #202d29;
+      --ink: #f4f4ef;
+      --muted: #d0d8d3;
+      --green: #88c8b4;
+      --green-dark: #b5e2d3;
+      --soft: #2c3b36;
+      --line: #53635c;
+      --focus: #9db9ff;
+    }
+    button, input, textarea { font: inherit; }
+    button {
+      min-height: 52px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      padding: 10px 16px;
+      color: var(--green-dark);
+      background: var(--soft);
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+    button.primary { color: #fff; background: var(--green); border-color: var(--green); }
+    button.primary:active { background: var(--green-dark); }
+    button:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+    button:disabled { opacity: .5; cursor: default; }
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      max-width: 720px;
+      margin: auto;
+      padding: 10px 18px 4px;
+    }
+    .brand { font-size: calc(23px * var(--scale)); font-weight: 800; letter-spacing: -.02em; }
+    .brand-mark { color: var(--green); font-size: .68em; vertical-align: .12em; }
+    .settings-button { min-height: 46px; padding: 7px 12px; font-size: calc(15px * var(--scale)); }
+    main {
+      width: 100%;
+      max-width: 720px;
+      min-height: calc(100dvh - 145px);
+      margin: 0 auto;
+      padding: 10px 18px 112px;
+    }
+    h1 { margin: 5px 0 4px; font-size: calc(29px * var(--scale)); line-height: 1.2; }
+    h2 { margin: 0 0 5px; font-size: calc(21px * var(--scale)); line-height: 1.3; }
+    h3 { margin: 0 0 5px; font-size: calc(18px * var(--scale)); }
+    p { margin: 5px 0 10px; }
+    .intro { margin-top: 4px; color: var(--muted); }
+    .muted { color: var(--muted); }
+    .small { font-size: calc(15px * var(--scale)); }
+    .card {
+      margin-top: 13px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 2px 8px rgba(20, 46, 37, .04);
+    }
+    .card > button { width: 100%; margin-top: 9px; }
+    .big-value { margin: 8px 0; font-size: calc(24px * var(--scale)); font-weight: 800; line-height: 1.25; }
+    .progress-track { height: 14px; margin-top: 12px; overflow: hidden; border-radius: 99px; background: var(--soft); }
+    .progress-fill { height: 100%; border-radius: inherit; background: var(--green); }
+    .list { display: grid; gap: 10px; margin-top: 12px; }
+    .plan-item { padding: 14px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); }
+    .plan-title { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+    .time { min-width: 54px; color: var(--green-dark); font-weight: 800; }
+    .plan-name { font-size: calc(19px * var(--scale)); font-weight: 750; overflow-wrap: anywhere; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
+    .button-row button { flex: 1 1 115px; min-height: 48px; padding: 8px 10px; font-size: calc(15px * var(--scale)); }
+    .task-step {
+      display: grid;
+      min-height: 150px;
+      place-items: center start;
+      margin: 15px 0 8px;
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--soft);
+      font-size: calc(27px * var(--scale));
+      font-weight: 800;
+      line-height: 1.3;
+    }
+    .task-progress { height: 12px; border-radius: 20px; background: var(--soft); overflow: hidden; }
+    .task-progress > span { display: block; height: 100%; background: var(--green); }
+    .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px; }
+    .choice-grid button { min-height: 62px; text-align: center; }
+    button[aria-pressed="true"] { outline: 3px solid var(--green); outline-offset: 2px; }
+    .help-copy { padding: 14px; border-left: 5px solid var(--green); border-radius: 8px; background: var(--soft); }
+    .help-copy p { margin: 0 0 8px; }
+    .help-copy p:last-child { margin-bottom: 0; }
+    .nav-wrap {
+      position: fixed;
+      z-index: 5;
+      right: 0; bottom: 0; left: 0;
+      padding: 7px 6px max(8px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+    nav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      width: 100%;
+      max-width: 720px;
+      margin: auto;
+    }
+    nav button {
+      min-width: 0;
+      min-height: 56px;
+      padding: 6px 2px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: transparent;
+      font-size: calc(13px * var(--scale));
+      line-height: 1.15;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    nav button[aria-current="page"] { border-color: var(--line); background: var(--soft); color: var(--green-dark); }
+    .overlay {
+      position: fixed;
+      z-index: 10;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(16, 28, 24, .55);
+    }
+    .dialog {
+      width: min(100%, 560px);
+      max-height: min(90dvh, 760px);
+      overflow: auto;
+      padding: 18px;
+      border: 2px solid var(--line);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 10px 44px rgba(0, 0, 0, .22);
+    }
+    .dialog h2 { font-size: calc(23px * var(--scale)); }
+    .dialog button { width: 100%; margin-top: 9px; }
+    .field { display: grid; gap: 4px; margin-top: 12px; font-weight: 700; }
+    .field input, .field textarea {
+      width: 100%;
+      min-height: 50px;
+      padding: 10px 12px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: var(--surface);
+    }
+    .field select { width: 100%; min-height: 50px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--surface); font: inherit; }
+    .field textarea { min-height: 92px; resize: vertical; }
+    .radio-row { display: grid; gap: 8px; margin: 10px 0; }
+    .radio-row label, .check-row { display: flex; align-items: center; gap: 10px; min-height: 48px; }
+    input[type="radio"], input[type="checkbox"] { width: 23px; height: 23px; accent-color: var(--green); }
+    .status { min-height: 24px; margin-top: 10px; color: var(--green-dark); font-weight: 700; }
+    .breath-word { display: grid; min-height: 130px; place-items: center; margin: 12px 0; border-radius: 18px; background: var(--soft); text-align: center; font-size: calc(30px * var(--scale)); font-weight: 800; }
+    .breath-time { text-align: center; font-size: calc(20px * var(--scale)); }
+    .warning { border-left: 5px solid #9b4a26; }
+    .footer-note { margin: 16px 2px; }
+    .callout { padding: 14px; border-radius: 16px; background: var(--soft); }
+    .date-controls { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 7px; align-items: center; margin: 12px 0; }
+    .date-controls button { min-height: 48px; padding: 7px; text-align: center; }
+    .date-controls input { min-width: 0; width: 100%; min-height: 48px; padding: 7px; border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; }
+    .plan-meta { margin: 5px 0; color: var(--muted); font-size: calc(15px * var(--scale)); }
+    .tag { display: inline-block; margin: 4px 4px 4px 0; padding: 3px 9px; border-radius: 99px; background: var(--soft); color: var(--green-dark); font-size: calc(14px * var(--scale)); font-weight: 700; }
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px; }
+    .tool-grid button { min-height: 66px; text-align: center; }
+    .step-list { padding-left: 24px; }
+    .step-list li { margin: 8px 0; }
+    .divider { height: 1px; margin: 12px 0; background: var(--line); }
+    .large-choice { min-height: 74px !important; font-size: calc(19px * var(--scale)); }
+    .text-option { display: block; padding: 10px 12px; border-radius: 12px; background: var(--soft); margin: 7px 0; }
+    .day-summary { display: flex; flex-wrap: wrap; gap: 8px; }
+    @media (min-width: 640px) {
+      main { padding-left: 24px; padding-right: 24px; }
+      .app-header { padding-left: 24px; padding-right: 24px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">SAMENWIJS <span class="brand-mark" aria-hidden="true">●</span></div>
+    <button id="settings-open" class="settings-button" type="button">Instellingen</button>
+  </header>
+  <main id="main" aria-live="polite"></main>
+  <div class="nav-wrap">
+    <nav aria-label="Hoofdnavigatie">
+      <button type="button" data-page="today">Vandaag</button>
+      <button type="button" data-page="day">Mijn dag</button>
+      <button type="button" data-page="skills">Leren</button>
+      <button type="button" data-page="rest">Rust</button>
+      <button type="button" data-page="together">Samen</button>
+    </nav>
+  </div>
+  <div id="dialog-root"></div>
+  <script>
+    (function () {
+      "use strict";
+      var STORAGE_KEY = "samenwijs-v1";
+      var examplePlan = [
+        { time: "08:30", title: "Ontbijten", done: false },
+        { time: "10:00", title: "Mijn activiteit", done: false },
+        { time: "12:30", title: "Lunchen", done: false },
+        { time: "16:00", title: "Rustmoment", done: false },
+        { time: "18:00", title: "Avondeten", done: false }
+      ];
+      var templates = [
+        { category: "Voor jezelf zorgen", title: "Tanden poetsen", steps: ["Pak je tandenborstel.", "Maak de borstel nat.", "Doe een beetje tandpasta op de borstel.", "Poets je tanden rustig.", "Spoel je mond en maak de borstel schoon."] },
+        { category: "Voor jezelf zorgen", title: "Douchen", steps: ["Leg je handdoek en schone kleren klaar.", "Zet de douche aan. Kies een fijne temperatuur.", "Maak je lichaam en haren nat.", "Was jezelf met zeep of shampoo.", "Spoel alles af en droog jezelf af."] },
+        { category: "Voor jezelf zorgen", title: "Aankleden", steps: ["Kies kleren die fijn zitten.", "Leg de kleren klaar.", "Trek je ondergoed aan.", "Trek je kleren aan.", "Kijk of je warm genoeg bent."] },
+        { category: "Eten en drinken", title: "Een boterham maken", steps: ["Pak een bord, brood en beleg.", "Leg een boterham op je bord.", "Doe beleg op de boterham.", "Leg alles terug op de plek.", "Eet rustig en drink iets."] },
+        { category: "Thuis", title: "Mijn kamer opruimen", steps: ["Kies één klein stukje van je kamer.", "Leg afval in de prullenbak.", "Leg kleren op één plek.", "Leg spullen terug op hun vaste plek.", "Klaar. Je hoeft niet alles tegelijk te doen."] },
+        { category: "Thuis", title: "De was doen", steps: ["Leg vuile kleren bij elkaar.", "Doe de kleren in de wasmachine.", "Vraag zo nodig hulp met het wasmiddel.", "Kies het programma dat je hebt afgesproken.", "Haal de was eruit als de machine klaar is."] },
+        { category: "Onderweg", title: "Klaarmaken om naar buiten te gaan", steps: ["Kijk wat voor weer het is.", "Pak je jas en je tas.", "Doe je jas aan.", "Pak je sleutels en telefoon.", "Kijk of je alles hebt. Je kunt nu gaan."] },
+        { category: "Onderweg", title: "Naar een afspraak gaan", steps: ["Kijk hoe laat de afspraak is.", "Kijk waar je moet zijn.", "Leg je spullen klaar.", "Vertrek op tijd. Vraag hulp als je de weg niet weet.", "Zeg bij aankomst dat je er bent."] },
+        { category: "Afspraken", title: "Een afspraak voorbereiden", steps: ["Schrijf op waar de afspraak over gaat.", "Schrijf vragen op die je wilt stellen.", "Neem je afsprakenkaart of andere spullen mee.", "Je mag vragen of iemand iets rustig herhaalt.", "Vraag aan het einde wat er is afgesproken."] },
+        { category: "Contact", title: "Iemand bellen", steps: ["Bedenk wat je wilt zeggen.", "Zoek het telefoonnummer op.", "Bel de persoon.", "Zeg je naam en waarom je belt.", "Luister. Vraag of iemand het rustig wil herhalen als dat nodig is."] },
+        { category: "Contact", title: "Hulp vragen", steps: ["Denk na over wat moeilijk is.", "Kies iemand die je vertrouwt.", "Zeg: ik heb hulp nodig met…", "Vertel één ding tegelijk.", "Vraag wat de volgende stap is."] },
+        { category: "Geld en boodschappen", title: "Boodschappen doen", steps: ["Maak een lijstje van wat je nodig hebt.", "Neem je tas en betaalmiddel mee.", "Pak de spullen van je lijstje.", "Kijk wat de prijs is voordat je iets koopt.", "Betaal en bewaar je bonnetje als je dat wilt."] },
+        { category: "Veiligheid", title: "Iemand vraagt om mijn code of wachtwoord", steps: ["Stop even. Deel je code of wachtwoord niet.", "Klik niet op een link als je twijfelt.", "Bel zelf iemand die je vertrouwt op een bekend nummer.", "Vraag die persoon om mee te kijken.", "Bij direct gevaar: ga naar een veilige plek en bel 112."] },
+        { category: "Veiligheid", title: "Ik voel mij niet veilig", steps: ["Ga als dat kan naar een plek met andere mensen.", "Zeg duidelijk: stop, ik wil dit niet.", "Bel iemand die je vertrouwt.", "Laat je hulpkaart zien als praten moeilijk is.", "Bij direct gevaar: bel 112."] },
+        { category: "Rust en overzicht", title: "Mijn avond rustig afsluiten", steps: ["Leg kleren voor morgen klaar.", "Leg je telefoon op de afgesproken plek.", "Poets je tanden.", "Kies iets rustigs om te doen.", "Ga naar bed wanneer dat voor jou werkt."] }
+      ];
+      var state = loadState();
+      var page = "today";
+      var taskIndex = -1;
+      var stepIndex = 0;
+      var selectedSkillCategory = "Alles";
+      var taskSearch = "";
+      var selectedNeed = "";
+      var breathingTimer = null;
+      var deleteIndex = -1;
+      var groundStep = 0;
+
+      function dayKey() {
+        var d = new Date();
+        return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      }
+      function loadState() {
+        var saved = {};
+        try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch (e) {}
+        var today = dayKey();
+        var plans = saved.plans && typeof saved.plans === "object" ? saved.plans : {};
+        if (!saved.plans && Array.isArray(saved.plan)) plans[today] = saved.plan;
+        if (!plans[today]) plans[today] = examplePlan.map(function (item) { return Object.assign({}, item); });
+        var selectedDate = today;
+        var moods = saved.moods && typeof saved.moods === "object" ? saved.moods : {};
+        if (!saved.moods && saved.mood) moods[saved.moodDay || today] = saved.mood;
+        var sensoryByDay = saved.sensoryByDay && typeof saved.sensoryByDay === "object" ? saved.sensoryByDay : {};
+        if (!saved.sensoryByDay && Array.isArray(saved.sensorySignals)) sensoryByDay[today] = saved.sensorySignals;
+        var result = {
+          name: saved.name || "",
+          selectedDate: selectedDate,
+          plans: plans,
+          plan: Array.isArray(plans[selectedDate]) ? plans[selectedDate] : [],
+          moods: moods,
+          mood: moods[selectedDate] || "",
+          moodDay: selectedDate,
+          moodHistory: Array.isArray(saved.moodHistory) ? saved.moodHistory : [],
+          contactName: saved.contactName || "",
+          contactPhone: saved.contactPhone || "",
+          contacts: Array.isArray(saved.contacts) ? saved.contacts : [],
+          note: saved.note || "",
+          earlySigns: saved.earlySigns || "",
+          calmingPlan: saved.calmingPlan || "",
+          safePlace: saved.safePlace || "",
+          sensoryByDay: sensoryByDay,
+          sensorySignals: Array.isArray(sensoryByDay[selectedDate]) ? sensoryByDay[selectedDate] : [],
+          scale: Number(saved.scale) || 0,
+          contrast: Boolean(saved.contrast),
+          darkMode: Boolean(saved.darkMode),
+          simpleHome: Boolean(saved.simpleHome),
+          example: typeof saved.example === "boolean" ? saved.example : !Array.isArray(saved.plan),
+          customTasks: Array.isArray(saved.customTasks) ? saved.customTasks : [],
+          goals: Array.isArray(saved.goals) ? saved.goals : [],
+          budgetLimit: Number(saved.budgetLimit) || 0,
+          expenses: Array.isArray(saved.expenses) ? saved.expenses : [],
+          preferences: saved.preferences || {},
+          onboarded: Boolean(saved.onboarded)
+        };
+        return result;
+      }
+      function save() {
+        try {
+          state.plans[state.selectedDate] = state.plan;
+          state.moods[state.selectedDate] = state.mood;
+          state.sensoryByDay[state.selectedDate] = state.sensorySignals;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          return true;
+        } catch (e) {
+          setStatus("Opslaan lukte niet. Controleer de opslagruimte op je telefoon.");
+          return false;
+        }
+      }
+      function esc(value) {
+        return String(value).replace(/[&<>"']/g, function (character) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
+        });
+      }
+      function name() { return state.name.trim() || "Jij"; }
+      function bodyScale() { return 1 + state.scale * 0.12; }
+      function dateText() {
+        return new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long" }).format(new Date(state.selectedDate + "T12:00:00"));
+      }
+      function selectDate(value) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return;
+        state.plans[state.selectedDate] = state.plan;
+        state.selectedDate = value;
+        state.plan = Array.isArray(state.plans[value]) ? state.plans[value] : [];
+        state.mood = state.moods[value] || "";
+        state.moodDay = value;
+        state.sensorySignals = Array.isArray(state.sensoryByDay[value]) ? state.sensoryByDay[value] : [];
+        save();
+        render();
+      }
+      function shiftDate(days) {
+        var date = new Date(state.selectedDate + "T12:00:00");
+        date.setDate(date.getDate() + days);
+        selectDate(date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0"));
+      }
+      function copyPreviousPlan() {
+        var previous = new Date(state.selectedDate + "T12:00:00");
+        previous.setDate(previous.getDate() - 1);
+        var key = previous.getFullYear() + "-" + String(previous.getMonth() + 1).padStart(2, "0") + "-" + String(previous.getDate()).padStart(2, "0");
+        if (!state.plans[key] || state.plans[key].length === 0) {
+          openDialog("Geen planning gevonden", "<p>De vorige dag heeft geen activiteiten om te kopiëren.</p>" + btn("Sluiten", "close-dialog", true));
+          return;
+        }
+        state.plan = state.plans[key].map(function (item) {
+          return Object.assign({}, item, { done: false, reminder: 0, reminderId: "" });
+        });
+        state.example = false;
+        save();
+        render();
+      }
+      function greeting() {
+        var hour = new Date().getHours();
+        return hour < 12 ? "Goedemorgen" : (hour < 18 ? "Goedemiddag" : "Goedenavond");
+      }
+      function setStatus(message) {
+        var node = document.getElementById("status");
+        if (node) node.textContent = message;
+      }
+      function applyPreferences() {
+        document.documentElement.style.setProperty("--scale", String(bodyScale()));
+        document.body.classList.toggle("high-contrast", state.contrast);
+        document.body.classList.toggle("dark-mode", state.darkMode);
+      }
+      function render() {
+        applyPreferences();
+        document.querySelectorAll("nav [data-page]").forEach(function (button) {
+          if (button.dataset.page === page) button.setAttribute("aria-current", "page");
+          else button.removeAttribute("aria-current");
+        });
+        var main = document.getElementById("main");
+        if (page === "today") renderToday(main);
+        if (page === "day") renderPlan(main);
+        if (page === "skills") renderSkills(main);
+        if (page === "rest") renderRest(main);
+        if (page === "together") renderTogether(main);
+        window.scrollTo(0, 0);
+      }
+      function card(title, content, extraClass) {
+        return '<section class="card ' + (extraClass || "") + '"><h2>' + title + '</h2>' + content + '</section>';
+      }
+      function btn(label, action, primary, pressed) {
+        return '<button type="button" data-action="' + action + '"' +
+          (pressed === null || typeof pressed === "undefined" ? "" : ' aria-pressed="' + (pressed ? "true" : "false") + '"') +
+          (primary ? ' class="primary"' : "") + '>' + label + '</button>';
+      }
+      function renderToday(main) {
+        var done = state.plan.filter(function (item) { return item.done; }).length;
+        var next = state.plan.find(function (item) { return !item.done; });
+        var greetingText = '<h1>' + greeting() + ', ' + esc(name()) + '.</h1>' +
+          '<p class="intro">Fijn dat je er bent. Je hoeft niet alles tegelijk te doen.</p>' +
+          '<p class="small">' + esc(dateText()) + '</p>';
+        var dayContent = '<p>' + done + ' van ' + state.plan.length + ' activiteiten klaar</p>' +
+          '<div class="progress-track" role="progressbar" aria-label="Voortgang van vandaag" aria-valuemin="0" aria-valuemax="' + Math.max(1, state.plan.length) + '" aria-valuenow="' + done + '">' +
+          '<div class="progress-fill" style="width:' + (state.plan.length ? Math.round(done / state.plan.length * 100) : 100) + '%"></div></div>';
+        var nextContent = next
+          ? '<p class="small">Eerstvolgende activiteit</p><div class="big-value">' + esc(next.time) + ' · ' + esc(next.title) + '</div>' +
+            (next.place ? '<p>Waar: ' + esc(next.place) + '</p>' : '') +
+            (next.person ? '<p>Met: ' + esc(next.person) + '</p>' : '') +
+            '<p>Je kunt zelf kiezen wanneer je begint.</p>' + btn("Bekijk mijn dag", "go-day", false)
+          : '<div class="big-value">Je planning is klaar.</div><p>Goed gedaan. Je mag iets fijns doen of rust nemen.</p>' + btn("Bekijk mijn dag", "go-day", false);
+        var moodContent = state.mood
+          ? '<p>Vandaag koos je: <strong>' + esc(state.mood) + '</strong>.</p>'
+          : '<p>Je kunt dit invullen wanneer je wilt.</p>';
+        var helpNow = '<p>Voelt het te veel? Je mag om hulp vragen.</p>' + btn("Ik heb nu hulp nodig", "go-together", true);
+        var quickTools = '<div class="tool-grid">' +
+          btn("Stap voor stap", "go-skills", false) +
+          btn("Ik wil even rust", "go-rest", false) +
+          '</div>';
+        var extra = state.simpleHome
+          ? card("Ik heb hulp nodig", helpNow, "")
+          : card("Hoe gaat het met jou?", moodContent + btn("Kies hoe ik mij voel", "go-rest", false), "") +
+            card("Wat heb je nu nodig?", helpNow + quickTools, "");
+        main.innerHTML = greetingText +
+          card("Mijn dag", dayContent, "") +
+          card("Wat komt hierna?", nextContent, "") +
+          extra +
+          (state.example ? '<p class="small footer-note">Dit is een voorbeeld. Pas het aan zodat het bij jou past.</p>' : "");
+      }
+      function renderPlan(main) {
+        var html = '<h1>Mijn dag</h1><p class="intro">Kijk wat er komt. Je mag de planning aanpassen.</p>' +
+          '<div class="date-controls">' + btn("←  Dag terug", "date-prev", false) +
+          '<input id="plan-date" type="date" aria-label="Kies een dag" value="' + esc(state.selectedDate) + '">' +
+          btn("Dag vooruit  →", "date-next", false) + '</div>' +
+          (state.selectedDate !== dayKey() ? btn("Ga naar vandaag", "date-today", false) : '') +
+          btn("＋  Activiteit toevoegen", "add-item", true);
+        if (state.selectedDate !== dayKey() && state.plan.length === 0) {
+          html += btn("Kopieer de planning van gisteren", "copy-prev", false);
+        }
+        html += '<div class="list">';
+        if (!state.plan.length) {
+          html += '<section class="card"><h2>Er staat nog niets in je planning.</h2><p>Je kunt een activiteit toevoegen wanneer je wilt.</p></section>';
+        }
+        state.plan.forEach(function (item, index) {
+          html += '<article class="plan-item"><div class="plan-title"><span class="time">' + esc(item.time) + '</span><span class="plan-name">' + esc(item.title) + '</span></div>' +
+            (item.place ? '<p class="plan-meta">📍 ' + esc(item.place) + '</p>' : '') +
+            (item.person ? '<p class="plan-meta">👥 ' + esc(item.person) + '</p>' : '') +
+            (item.note ? '<p class="plan-meta">' + esc(item.note) + '</p>' : '') +
+            btn(item.done ? "✓  Gedaan" : "Markeer als gedaan", "toggle-item:" + index, false, item.done) +
+            '<div class="button-row">' +
+            btn("Aanpassen", "edit-item:" + index, false) +
+            btn("Omhoog", "move-up:" + index, false) +
+            btn("Omlaag", "move-down:" + index, false) +
+            btn("Verwijder", "delete-item:" + index, false) + '</div></article>';
+        });
+        html += '</div><p class="small footer-note">Je planning is van jou. Een activiteit mag ook later of anders.</p>';
+        main.innerHTML = html;
+      }
+      function allTasks() { return templates.concat(state.customTasks || []); }
+      function renderSkills(main) {
+        var html = '<h1>Vaardigheden en doelen</h1><p class="intro">Oefen iets dat jij belangrijk vindt. In jouw tempo.</p>';
+        var tasks = allTasks();
+        if (taskIndex >= 0 && tasks[taskIndex]) {
+          var task = tasks[taskIndex];
+          html += '<section class="card"><span class="tag">' + esc(task.category || "Mijn stappenplan") + '</span>' +
+            '<h2>' + esc(task.title) + '</h2><p>Stap ' + (stepIndex + 1) + ' van ' + task.steps.length + '</p>' +
+            '<div class="task-step" aria-live="polite">' + esc(task.steps[stepIndex]) + '</div>' +
+            '<div class="task-progress" role="progressbar" aria-label="Voortgang van de taak" aria-valuemin="0" aria-valuemax="' + task.steps.length + '" aria-valuenow="' + (stepIndex + 1) + '">' +
+            '<span style="width:' + Math.round((stepIndex + 1) / task.steps.length * 100) + '%"></span></div></section>';
+          html += btn("Lees deze stap voor", "speak-step", false);
+          if (stepIndex > 0) html += btn("Vorige stap", "prev-step", false);
+          if (stepIndex < task.steps.length - 1) html += btn("Volgende stap", "next-step", true);
+          else html += btn("Klaar met deze taak", "finish-task", true);
+          html += btn("Stop deze taak", "stop-task", false);
+        } else {
+          html += btn("＋  Mijn eigen stappenplan maken", "add-custom-task", true);
+          var categories = [];
+          tasks.forEach(function (task) {
+            var category = task.category || "Mijn stappenplan";
+            if (categories.indexOf(category) === -1) categories.push(category);
+          });
+          html += '<label class="field" for="skill-category">Kies een soort taak<select id="skill-category">' +
+            '<option value="Alles">Alle soorten</option>' +
+            categories.map(function (category) {
+              return '<option value="' + esc(category) + '"' + (selectedSkillCategory === category ? " selected" : "") + '>' + esc(category) + '</option>';
+            }).join("") + '</select></label>' +
+            '<label class="field" for="task-search">Zoek een taak<input id="task-search" type="search" maxlength="50" value="' + esc(taskSearch) + '" placeholder="Bijvoorbeeld: douchen"></label>';
+          var visibleCategories = selectedSkillCategory === "Alles" ? categories : [selectedSkillCategory];
+          if (taskSearch.trim()) {
+            visibleCategories = visibleCategories.filter(function (category) {
+              return tasks.some(function (task) {
+                return (task.category || "Mijn stappenplan") === category &&
+                  (task.title + " " + category).toLowerCase().indexOf(taskSearch.toLowerCase()) >= 0;
+              });
+            });
+          }
+          if (visibleCategories.length === 0) html += '<p>Ik kan deze taak niet vinden. Probeer een ander woord.</p>';
+          visibleCategories.forEach(function (category) {
+            html += '<h2 style="margin-top:20px">' + esc(category) + '</h2>';
+            tasks.forEach(function (task, index) {
+              if ((task.category || "Mijn stappenplan") !== category) return;
+              if (taskSearch.trim() && (task.title + " " + category).toLowerCase().indexOf(taskSearch.toLowerCase()) < 0) return;
+              html += '<section class="card" data-task-card="true" data-task-title="' + esc((task.title + " " + category).toLowerCase()) + '"><h2>' + esc(task.title) + '</h2><p>' + task.steps.length + ' stappen</p>' +
+                btn("Begin rustig", "start-task:" + index, false) +
+                (task.isCustom ? '<div class="button-row">' + btn("Aanpassen", "edit-custom-task:" + (index - templates.length), false) +
+                  btn("Verwijder", "delete-custom-task:" + (index - templates.length), false) + '</div>' : '') +
+                '</section>';
+            });
+          });
+          html += '<p class="small footer-note">Je mag stoppen, hulp vragen of later verdergaan.</p>';
+        }
+        html += '<section class="card"><h2>Mijn kleine doelen</h2><p>Kies iets dat jij graag wilt oefenen.</p>' +
+          btn("＋  Doel toevoegen", "add-goal", false);
+        if (!state.goals.length) html += '<p class="small">Je hebt nog geen doelen toegevoegd. Dat hoeft ook niet.</p>';
+        (state.goals || []).forEach(function (goal, index) {
+          html += '<div class="plan-item" style="margin-top:9px"><strong>' + esc(goal.title) + '</strong><p>' +
+            btn(goal.done ? "✓  Gedaan" : "Markeer als gedaan", "toggle-goal:" + index, false, goal.done) +
+            btn("Verwijder doel", "delete-goal:" + index, false) + '</p></div>';
+        });
+        html += '</section>';
+        html += renderMoney();
+        main.innerHTML = html;
+      }
+      function formatMoney(amount) {
+        return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(Number(amount) || 0);
+      }
+      function renderMoney() {
+        var month = state.selectedDate.slice(0, 7);
+        var monthExpenses = state.expenses.filter(function (item) { return item.date && item.date.slice(0, 7) === month; });
+        var spent = monthExpenses.reduce(function (total, item) { return total + Number(item.amount || 0); }, 0);
+        var content = state.budgetLimit > 0
+          ? '<p>Mijn maandbedrag: <strong>' + formatMoney(state.budgetLimit) + '</strong></p><p>Ingevoerd deze maand: <strong>' + formatMoney(spent) + '</strong></p>' +
+            '<div class="big-value">' + (state.budgetLimit - spent >= 0 ? formatMoney(state.budgetLimit - spent) + ' over' : formatMoney(spent - state.budgetLimit) + ' boven mijn bedrag') + '</div>'
+          : '<p>Je kunt zelf een maandbedrag invullen en uitgaven noteren.</p>';
+        content += btn(state.budgetLimit > 0 ? "Verander mijn maandbedrag" : "Vul mijn maandbedrag in", "set-budget", false) +
+          btn("＋  Uitgave noteren", "add-expense", true);
+        if (monthExpenses.length) {
+          content += '<div class="divider"></div><h3>Mijn uitgaven deze maand</h3>';
+          monthExpenses.slice(-8).reverse().forEach(function (item) {
+            content += '<div class="plan-item" style="margin-top:8px"><strong>' + esc(item.title) + '</strong><p class="plan-meta">' +
+              esc(shortDate(item.date)) + ' · ' + formatMoney(item.amount) + '</p>' +
+              btn("Verwijder deze uitgave", "delete-expense:" + state.expenses.indexOf(item), false) + '</div>';
+          });
+        }
+        return card("Mijn geld", content + '<p class="small">Dit is alleen jouw eigen overzicht. SAMENWIJS geeft geen geldadvies en kan geen betaling doen.</p>', "");
+      }
+      function renderRest(main) {
+        var moods = [
+          ["🙂", "Goed"], ["😌", "Rustig"], ["😟", "Onrustig"], ["😣", "Overprikkeld"], ["😴", "Moe"]
+        ];
+        var choices = '<div class="choice-grid">' + moods.map(function (mood) {
+          return btn(mood[0] + "  " + mood[1], "mood:" + mood[1], false, state.mood === mood[1]);
+        }).join("") + '</div>';
+        var signals = [
+          "Geluid voelt hard", "Licht is fel", "Veel mensen om mij heen",
+          "Mijn planning is veranderd", "Ik ben moe", "Mijn lichaam voelt onrustig"
+        ];
+        var signalButtons = signals.map(function (signal, index) {
+          return btn(signal, "signal:" + index, false, state.sensorySignals.indexOf(signal) >= 0);
+        }).join("");
+        var needs = [
+          ["rustig", "Een rustige plek"], ["prikkels", "Minder geluid of licht"],
+          ["hulp", "Hulp van iemand"], ["bewegen", "Even bewegen"]
+        ].map(function (need) {
+          return btn(need[1], "need:" + need[0], false, selectedNeed === need[0]);
+        }).join("");
+        var tip = selectedNeed ? '<p class="help-copy" role="status">' + esc(needSuggestion(selectedNeed)) + '</p>' : "";
+        var plan = '<p>Je kunt zelf opschrijven wat jou helpt.</p>' +
+          (state.earlySigns ? '<p><strong>Ik merk het aan:</strong> ' + esc(state.earlySigns) + '</p>' : '') +
+          (state.calmingPlan ? '<p><strong>Dit helpt mij:</strong> ' + esc(state.calmingPlan) + '</p>' : '') +
+          (state.safePlace ? '<p><strong>Mijn rustige plek:</strong> ' + esc(state.safePlace) + '</p>' : '') +
+          btn("Pas mijn rustplan aan", "settings", false);
+        var recent = (state.moodHistory || []).slice(-7).reverse();
+        var history = recent.length ? '<div class="day-summary">' + recent.map(function (item) {
+          return '<span class="tag">' + esc(shortDate(item.date)) + ': ' + esc(item.mood) + '</span>';
+        }).join("") + '</div>' : '<p class="small">Als je wilt, kun je hier je gevoelens van de laatste dagen bekijken.</p>';
+        main.innerHTML = '<h1>Rust en gevoel</h1><p class="intro">Kies wat bij jou past. Er is geen goed of fout.</p>' +
+          card("Hoe voel je je nu?", choices, "") +
+          card("Wat merk je aan prikkels?", '<p>Kies wat klopt. Je mag ook niets kiezen.</p><div class="choice-grid">' + signalButtons + '</div>', "") +
+          card("Wat heb je nu nodig?", '<div class="choice-grid">' + needs + '</div>' + tip, "") +
+          card("Mijn persoonlijke rustplan", plan, "") +
+          card("Even rustig ademen", '<p>Een korte oefening met een timer. Je mag altijd stoppen.</p>' + btn("Start de oefening van 1 minuut", "start-breath", true) + btn("Kijk om je heen: een korte grondoefening", "grounding", false), "") +
+          card("Mijn gevoelens van de laatste dagen", history, "");
+      }
+      function shortDate(value) {
+        if (!value) return "";
+        return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(new Date(value + "T12:00:00"));
+      }
+      function needSuggestion(need) {
+        if (need === "rustig") return "Ga als dat kan naar een plek waar je je veilig voelt. Je mag even niets doen.";
+        if (need === "prikkels") return "Maak het stiller of donkerder. Een koptelefoon of zonnebril kan helpen.";
+        if (need === "hulp") return "Laat je hulpkaart zien of vraag iemand die je vertrouwt om bij je te komen.";
+        return "Sta op als dat prettig voelt. Rek je uit of loop rustig een klein stukje.";
+      }
+      function getContacts() {
+        var list = [];
+        if (state.contactName.trim() || state.contactPhone.trim()) {
+          list.push({ name: state.contactName.trim() || "Vertrouwd contact", phone: state.contactPhone.trim() });
+        }
+        (state.contacts || []).forEach(function (contact) {
+          if (contact.name || contact.phone) list.push(contact);
+        });
+        return list;
+      }
+      function renderTogether(main) {
+        var contacts = getContacts();
+        var contact = contacts.length
+          ? contacts.map(function (item, index) {
+            return '<p><strong>' + esc(item.name || "Vertrouwd contact") + '</strong>' +
+              (item.phone ? '<br>' + esc(item.phone) + btn("Bel " + esc(item.name || "dit contact") + " (telefoon opent)", "dial:" + index, false) : '') +
+              '</p>';
+          }).join("")
+          : '<p>Je hebt nog geen vertrouwd contact toegevoegd.</p>';
+        var note = state.note.trim()
+          ? '<p><strong>Dit wil ik ook vertellen:</strong><br>' + esc(state.note.trim()).replace(/\n/g, "<br>") + '</p>' : "";
+        var signs = state.earlySigns.trim() ? '<p><strong>Ik merk spanning aan:</strong><br>' + esc(state.earlySigns).replace(/\n/g, "<br>") + '</p>' : "";
+        var plan = state.calmingPlan.trim() ? '<p><strong>Dan helpt het als je:</strong><br>' + esc(state.calmingPlan).replace(/\n/g, "<br>") + '</p>' : "";
+        var place = state.safePlace.trim() ? '<p><strong>Een rustige plek voor mij is:</strong> ' + esc(state.safePlace) + '</p>' : "";
+        var copy = '<div class="help-copy"><p><strong>' + esc(name()) + '</strong></p>' +
+          '<p>Praat rustig en gebruik korte zinnen.</p><p>Geef mij tijd om na te denken en te antwoorden.</p>' +
+          '<p>Vertel stap voor stap wat er gaat gebeuren.</p>' + signs + plan + place + contact + note + '</div>';
+        var phrases = [
+          ["Ik begrijp het niet. Wil je het rustig nog een keer zeggen?", "Ik begrijp het niet. Wil je het rustig nog een keer zeggen?"],
+          ["Ik heb meer tijd nodig om na te denken.", "Ik heb meer tijd nodig om na te denken."],
+          ["Ik wil graag even pauze.", "Ik wil graag even pauze."],
+          ["Dit is te veel voor mij.", "Dit is te veel voor mij."],
+          ["Ik wil nu nee zeggen.", "Ik wil nu nee zeggen."],
+          ["Wil je opschrijven wat we hebben afgesproken?", "Wil je opschrijven wat we hebben afgesproken?"]
+        ].map(function (phrase, index) {
+          return btn(phrase[0], "phrase:" + index, false);
+        }).join("");
+        var tips = '<ul class="step-list"><li>Praat rustig en gebruik gewone woorden.</li>' +
+          '<li>Stel één vraag tegelijk. Geef tijd om te antwoorden.</li>' +
+          '<li>Leg uit wat er gaat gebeuren en wanneer iets verandert.</li>' +
+          '<li>Vraag wat de persoon zelf wil. Neem niet zomaar iets over.</li>' +
+          '<li>Vraag: “Wat helpt jou nu?”</li></ul>';
+        main.innerHTML = '<h1>Samen</h1><p class="intro">Jij kiest wat je laat zien en wie je om hulp vraagt.</p>' +
+          card("Mijn hulpkaart", copy + btn("Lees mijn hulpkaart voor", "speak-help", false) +
+            btn("Bekijk wat ik wil delen", "share-preview", true) + btn("Pas mijn gegevens aan", "settings", false), "") +
+          card("Mijn vertrouwde contacten", contact + btn("Contacten aanpassen", "settings", false), "") +
+          card("Wat kan ik zeggen?", '<p>Tik op een zin. Je kunt die laten zien of laten voorlezen.</p>' + phrases, "") +
+          card("Voor iemand die mij ondersteunt", tips, "") +
+          card("Bij direct gevaar", '<p>Bel het lokale alarmnummer. In Nederland is dat 112.</p>', "warning") +
+          '<p class="small footer-note">Je gegevens blijven op dit toestel. De app deelt niets vanzelf.</p>';
+      }
+      function openDialog(title, content, focusId) {
+        closeDialog();
+        var root = document.getElementById("dialog-root");
+        root.innerHTML = '<div class="overlay" data-overlay><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" tabindex="-1">' +
+          '<h2 id="dialog-title">' + title + '</h2>' + content + '</section></div>';
+        var overlay = root.querySelector("[data-overlay]");
+        overlay.addEventListener("click", function (event) { if (event.target === overlay) closeDialog(); });
+        var first = focusId ? document.getElementById(focusId) : root.querySelector("button, input, textarea");
+        if (first) first.focus();
+      }
+      function closeDialog() {
+        if (breathingTimer) { clearInterval(breathingTimer); breathingTimer = null; }
+        document.getElementById("dialog-root").innerHTML = "";
+      }
+      function showSettings() {
+        var extraContacts = [0, 1].map(function (index) {
+          var contact = state.contacts[index] || {};
+          return '<label class="field" for="extra-contact-name-' + index + '">Extra contact ' + (index + 1) + ' (optioneel)' +
+            '<input id="extra-contact-name-' + index + '" maxlength="60" value="' + esc(contact.name || "") + '" placeholder="Naam">' +
+            '<input id="extra-contact-phone-' + index + '" type="tel" maxlength="30" value="' + esc(contact.phone || "") + '" placeholder="Telefoonnummer"></label>';
+        }).join("");
+        var content = '<label class="field" for="person-name">Hoe wil je heten?<input id="person-name" maxlength="50" value="' + esc(state.name) + '" autocomplete="nickname"></label>' +
+          '<fieldset class="field"><legend>Tekstgrootte</legend><div class="radio-row">' +
+          '<label><input type="radio" name="scale" value="0" ' + (state.scale === 0 ? "checked" : "") + '> Normaal</label>' +
+          '<label><input type="radio" name="scale" value="1" ' + (state.scale === 1 ? "checked" : "") + '> Groot</label>' +
+          '<label><input type="radio" name="scale" value="2" ' + (state.scale === 2 ? "checked" : "") + '> Extra groot</label></div></fieldset>' +
+          '<label class="check-row"><input id="high-contrast" type="checkbox" ' + (state.contrast ? "checked" : "") + '> Meer contrast</label>' +
+          '<label class="check-row"><input id="dark-mode" type="checkbox" ' + (state.darkMode ? "checked" : "") + '> Donkere kleuren</label>' +
+          '<label class="field" for="contact-name">Naam van een vertrouwd contact (optioneel)<input id="contact-name" maxlength="60" value="' + esc(state.contactName) + '"></label>' +
+          '<label class="field" for="contact-phone">Telefoonnummer (optioneel)<input id="contact-phone" type="tel" maxlength="30" value="' + esc(state.contactPhone) + '"></label>' +
+          '<h3>Andere vertrouwde contacten</h3>' + extraContacts +
+          '<label class="field" for="personal-note">Persoonlijke zin op je hulpkaart (optioneel)<textarea id="personal-note" maxlength="400" placeholder="Bijvoorbeeld: Geef mij een rustige plek.">' + esc(state.note) + '</textarea></label>' +
+          '<div class="divider"></div><h3>Mijn rustplan (optioneel)</h3>' +
+          '<label class="field" for="early-signs">Ik merk spanning aan…<textarea id="early-signs" maxlength="300" placeholder="Bijvoorbeeld: ik praat minder of wil weg.">' + esc(state.earlySigns) + '</textarea></label>' +
+          '<label class="field" for="calming-plan">Dit helpt mij…<textarea id="calming-plan" maxlength="400" placeholder="Bijvoorbeeld: stilte en iemand die rustig blijft.">' + esc(state.calmingPlan) + '</textarea></label>' +
+          '<label class="field" for="safe-place">Mijn rustige plek is…<input id="safe-place" maxlength="120" value="' + esc(state.safePlace) + '"></label>' +
+          '<label class="check-row"><input id="simple-home" type="checkbox" ' + (state.simpleHome ? "checked" : "") + '> Laat op Vandaag alleen de belangrijkste dingen zien</label>' +
+          '<div class="status" id="status" role="status"></div>' +
+          btn("Bewaar instellingen", "save-settings", true) + btn("Exporteer mijn gegevens", "export-preview", false) + btn("Annuleer", "close-dialog", false) +
+          btn("Wis al mijn gegevens", "reset-confirm", false);
+        openDialog("Instellingen", content, "person-name");
+      }
+      function showWelcome() {
+        var content = '<p>Deze app is van jou. Kies alleen wat jou helpt. Je kunt alles later veranderen.</p>' +
+          '<label class="field" for="welcome-name">Hoe wil je heten? (mag leeg blijven)<input id="welcome-name" maxlength="50" autocomplete="nickname"></label>' +
+          '<fieldset class="field"><legend>Welke tekst is fijn?</legend><div class="radio-row">' +
+          '<label><input type="radio" name="welcome-scale" value="0" checked> Normaal</label>' +
+          '<label><input type="radio" name="welcome-scale" value="1"> Groot</label>' +
+          '<label><input type="radio" name="welcome-scale" value="2"> Extra groot</label></div></fieldset>' +
+          '<label class="check-row"><input id="welcome-contrast" type="checkbox"> Meer contrast</label>' +
+          '<label class="check-row"><input id="welcome-sample" type="checkbox" checked> Laat een voorbeeldplanning zien</label>' +
+          '<p class="small">Je gegevens blijven op je telefoon. Je kunt hulp vragen bij het instellen.</p>' +
+          btn("Start SAMENWIJS", "complete-onboarding", true);
+        openDialog("Welkom bij SAMENWIJS", content, "welcome-name");
+      }
+      function completeOnboarding() {
+        state.name = document.getElementById("welcome-name").value.trim();
+        var selectedScale = document.querySelector('input[name="welcome-scale"]:checked');
+        state.scale = selectedScale ? Number(selectedScale.value) : 0;
+        state.contrast = document.getElementById("welcome-contrast").checked;
+        state.onboarded = true;
+        if (!document.getElementById("welcome-sample").checked) {
+          state.plan = [];
+          state.plans[state.selectedDate] = [];
+          state.example = false;
+        }
+        save(); closeDialog(); render();
+      }
+      function showRoutineDialog(index) {
+        var existing = index >= 0 ? state.plan[index] : null;
+        var title = existing ? existing.title : "";
+        var time = existing ? existing.time : "09:00";
+        var place = existing ? existing.place || "" : "";
+        var person = existing ? existing.person || "" : "";
+        var note = existing ? existing.note || "" : "";
+        var reminder = existing ? Number(existing.reminder || 0) : 0;
+        var content = '<label class="field" for="activity-title">Wat ga je doen?<input id="activity-title" maxlength="70" value="' + esc(title) + '" autocomplete="off"></label>' +
+          '<label class="field" for="activity-time">Tijd (bijvoorbeeld 09:30)<input id="activity-time" type="time" value="' + esc(time) + '"></label>' +
+          '<label class="field" for="activity-place">Waar? (optioneel)<input id="activity-place" maxlength="100" value="' + esc(place) + '"></label>' +
+          '<label class="field" for="activity-person">Met wie? (optioneel)<input id="activity-person" maxlength="100" value="' + esc(person) + '"></label>' +
+          '<label class="field" for="activity-note">Wat moet ik weten? (optioneel)<textarea id="activity-note" maxlength="300">' + esc(note) + '</textarea></label>' +
+          '<label class="field" for="activity-reminder">Seintje vooraf<select id="activity-reminder">' +
+          '<option value="0"' + (reminder === 0 ? " selected" : "") + '>Geen seintje</option>' +
+          '<option value="5"' + (reminder === 5 ? " selected" : "") + '>5 minuten vooraf</option>' +
+          '<option value="15"' + (reminder === 15 ? " selected" : "") + '>15 minuten vooraf</option>' +
+          '</select></label>' +
+          '<div class="status" id="status" role="status"></div>' +
+          btn("Bewaar activiteit", "save-item:" + index, true) + btn("Annuleer", "close-dialog", false);
+        openDialog(existing ? "Activiteit aanpassen" : "Activiteit toevoegen", content, "activity-title");
+      }
+      function showDeleteDialog(index) {
+        deleteIndex = index;
+        var content = '<p>Wil je <strong>' + esc(state.plan[index].title) + '</strong> uit je planning halen?</p>' +
+          btn("Ja, verwijder", "confirm-delete", true) + btn("Annuleer", "close-dialog", false);
+        openDialog("Activiteit verwijderen?", content);
+      }
+      function showTaskEditor(index) {
+        var existing = index >= 0 ? state.customTasks[index] : null;
+        var steps = existing ? existing.steps.join("\n") : "";
+        var content = '<label class="field" for="custom-task-title">Naam van de taak<input id="custom-task-title" maxlength="70" value="' + esc(existing ? existing.title : "") + '"></label>' +
+          '<label class="field" for="custom-task-category">Soort taak<input id="custom-task-category" maxlength="50" value="' + esc(existing ? existing.category : "Mijn stappenplan") + '"></label>' +
+          '<label class="field" for="custom-task-steps">Schrijf één stap per regel<textarea id="custom-task-steps" maxlength="1200" placeholder="Pak je spullen.\nKijk wat je nodig hebt.\nVraag hulp als dat nodig is.">' + esc(steps) + '</textarea></label>' +
+          '<p class="small">Je kunt later altijd iets veranderen.</p>' +
+          '<div class="status" id="status" role="status"></div>' +
+          btn("Bewaar stappenplan", "save-custom-task:" + index, true) + btn("Annuleer", "close-dialog", false);
+        openDialog(existing ? "Stappenplan aanpassen" : "Mijn stappenplan", content, "custom-task-title");
+      }
+      function saveCustomTask(index) {
+        var title = document.getElementById("custom-task-title").value.trim();
+        var category = document.getElementById("custom-task-category").value.trim() || "Mijn stappenplan";
+        var steps = document.getElementById("custom-task-steps").value.split(/\r?\n/).map(function (step) { return step.trim(); }).filter(Boolean);
+        if (!title || steps.length < 2) {
+          setStatus("Vul een naam in en schrijf minstens twee stappen op.");
+          if (!title) document.getElementById("custom-task-title").focus();
+          else document.getElementById("custom-task-steps").focus();
+          return;
+        }
+        var task = { title: title, category: category, steps: steps, isCustom: true };
+        if (index >= 0 && state.customTasks[index]) state.customTasks[index] = task;
+        else state.customTasks.push(task);
+        save(); closeDialog(); render();
+      }
+      function showGoalDialog() {
+        openDialog("Een klein doel", '<p>Wat wil jij oefenen of graag doen?</p>' +
+          '<label class="field" for="goal-title">Mijn doel<input id="goal-title" maxlength="90" placeholder="Bijvoorbeeld: zelf een boterham maken"></label>' +
+          btn("Bewaar mijn doel", "save-goal", true) + btn("Annuleer", "close-dialog", false), "goal-title");
+      }
+      function saveGoal() {
+        var title = document.getElementById("goal-title").value.trim();
+        if (!title) { document.getElementById("goal-title").focus(); return; }
+        state.goals.push({ title: title, done: false });
+        save(); closeDialog(); render();
+      }
+      function showBudgetDialog() {
+        openDialog("Mijn maandbedrag", '<p>Vul het bedrag in dat jij zelf wilt gebruiken als overzicht.</p>' +
+          '<label class="field" for="budget-limit">Bedrag in euro’s<input id="budget-limit" type="number" inputmode="decimal" min="0" step="0.01" value="' +
+          (state.budgetLimit ? esc(state.budgetLimit) : '') + '"></label>' +
+          '<div class="status" id="status" role="status"></div>' +
+          btn("Bewaar bedrag", "save-budget", true) + btn("Annuleer", "close-dialog", false), "budget-limit");
+      }
+      function saveBudget() {
+        var value = Number(document.getElementById("budget-limit").value);
+        if (!Number.isFinite(value) || value < 0) { setStatus("Vul een bedrag van nul of hoger in."); return; }
+        state.budgetLimit = value;
+        save(); closeDialog(); render();
+      }
+      function showExpenseDialog() {
+        openDialog("Een uitgave noteren", '<label class="field" for="expense-title">Waar was de uitgave voor?<input id="expense-title" maxlength="80"></label>' +
+          '<label class="field" for="expense-amount">Bedrag in euro’s<input id="expense-amount" type="number" inputmode="decimal" min="0.01" step="0.01"></label>' +
+          '<div class="status" id="status" role="status"></div>' +
+          btn("Bewaar uitgave", "save-expense", true) + btn("Annuleer", "close-dialog", false), "expense-title");
+      }
+      function saveExpense() {
+        var title = document.getElementById("expense-title").value.trim();
+        var amount = Number(document.getElementById("expense-amount").value);
+        if (!title || !Number.isFinite(amount) || amount <= 0) {
+          setStatus("Vul een naam en een bedrag groter dan nul in.");
+          return;
+        }
+        state.expenses.push({ title: title, amount: Math.round(amount * 100) / 100, date: state.selectedDate });
+        save(); closeDialog(); render();
+      }
+      function showSharePreview() {
+        var content = '<p>Dit is de tekst die je gaat delen:</p><div class="help-copy">' + esc(helpCardText()).replace(/\n/g, "<br>") + '</div>' +
+          '<p class="small">Kies zelf met welke app of persoon je dit deelt.</p>' +
+          btn("Ja, kies waar ik dit deel", "share", true) + btn("Annuleer", "close-dialog", false);
+        openDialog("Mijn hulpkaart delen", content);
+      }
+      function communicationPhrases() {
+        return [
+          "Ik begrijp het niet. Wil je het rustig nog een keer zeggen?",
+          "Ik heb meer tijd nodig om na te denken.",
+          "Ik wil graag even pauze.",
+          "Dit is te veel voor mij.",
+          "Ik wil nu nee zeggen.",
+          "Wil je opschrijven wat we hebben afgesproken?"
+        ];
+      }
+      function showPhrase(index) {
+        var phrase = communicationPhrases()[index];
+        if (!phrase) return;
+        openDialog("Ik wil zeggen…", '<div class="breath-word">' + esc(phrase) + '</div>' +
+          btn("Lees deze zin voor", "speak-phrase:" + index, false) + btn("Sluiten", "close-dialog", true));
+      }
+      function showExportPreview() {
+        openDialog("Mijn gegevens exporteren", '<p>Dit bestand kan je planning, gevoelens, doelen, contactgegevens en rustplan bevatten.</p>' +
+          '<p>Bewaar het alleen op een plek die jij vertrouwt.</p>' +
+          btn("Ja, kies waar ik mijn bestand deel", "export-data", true) + btn("Annuleer", "close-dialog", false));
+      }
+      function exportData() {
+        state.plans[state.selectedDate] = state.plan;
+        var exportText = JSON.stringify({ format: "SAMENWIJS", version: 1, exportedAt: new Date().toISOString(), data: state }, null, 2);
+        if (window.NativeApp && window.NativeApp.shareText) window.NativeApp.shareText(exportText);
+        else if (navigator.share) navigator.share({ title: "Mijn SAMENWIJS-gegevens", text: exportText }).catch(function () {});
+        closeDialog();
+      }
+      var groundingWords = [
+        "Kijk rustig om je heen. Noem 5 dingen die je ziet.",
+        "Merk 4 dingen op die je kunt voelen.",
+        "Luister naar 3 geluiden.",
+        "Merk 2 geuren op. Je mag ook niets ruiken.",
+        "Merk 1 smaak op. Je mag stoppen wanneer je wilt."
+      ];
+      function showGrounding() {
+        groundStep = 0;
+        renderGroundingDialog();
+      }
+      function renderGroundingDialog() {
+        var done = groundStep >= groundingWords.length;
+        var word = done ? "De oefening is klaar. Je mag verder wanneer je wilt." : groundingWords[groundStep];
+        var actions = done
+          ? btn("Klaar", "close-dialog", true)
+          : (groundStep > 0 ? btn("Vorige", "ground-prev", false) : "") +
+            btn(groundStep === groundingWords.length - 1 ? "Klaar" : "Volgende", "ground-next", true) +
+            btn("Stop", "close-dialog", false);
+        openDialog("Even hier zijn", '<p>Je kunt dit doen of overslaan. Er is geen haast.</p><div class="breath-word">' + esc(word) + '</div>' + actions);
+      }
+      function showBreathing() {
+        var content = '<p>Adem rustig in. Adem rustig uit. Stop wanneer je wilt.</p>' +
+          '<div id="breath-word" class="breath-word" aria-live="polite">Adem rustig in</div>' +
+          '<div id="breath-time" class="breath-time" aria-live="off">60 seconden</div>' +
+          btn("Stop", "close-dialog", false);
+        openDialog("Rustig ademen", content, "breath-word");
+        var remaining = 60;
+        breathingTimer = setInterval(function () {
+          remaining -= 1;
+          var word = document.getElementById("breath-word");
+          var time = document.getElementById("breath-time");
+          if (!word || !time) { clearInterval(breathingTimer); breathingTimer = null; return; }
+          if (remaining <= 0) {
+            word.textContent = "De oefening is klaar.";
+            time.textContent = "Goed gedaan. Je mag verder met je dag.";
+            clearInterval(breathingTimer);
+            breathingTimer = null;
+            return;
+          }
+          var position = (60 - remaining) % 10;
+          word.textContent = position < 4 ? "Adem rustig in" : "Adem rustig uit";
+          time.textContent = remaining + " seconden";
+        }, 1000);
+      }
+      function showResetConfirmation() {
+        openDialog("Al je gegevens wissen?", '<p>Je planning, gevoel en hulpkaart worden van dit toestel verwijderd.</p>' +
+          btn("Ja, wis alles", "reset-data", true) + btn("Annuleer", "close-dialog", false));
+      }
+      function saveSettings() {
+        state.name = document.getElementById("person-name").value.trim();
+        var checked = document.querySelector('input[name="scale"]:checked');
+        state.scale = checked ? Number(checked.value) : 0;
+        state.contrast = document.getElementById("high-contrast").checked;
+        state.darkMode = document.getElementById("dark-mode").checked;
+        state.contactName = document.getElementById("contact-name").value.trim();
+        state.contactPhone = document.getElementById("contact-phone").value.trim();
+        state.contacts = [0, 1].map(function (index) {
+          return {
+            name: document.getElementById("extra-contact-name-" + index).value.trim(),
+            phone: document.getElementById("extra-contact-phone-" + index).value.trim()
+          };
+        }).filter(function (contact) { return contact.name || contact.phone; });
+        state.note = document.getElementById("personal-note").value.trim();
+        state.earlySigns = document.getElementById("early-signs").value.trim();
+        state.calmingPlan = document.getElementById("calming-plan").value.trim();
+        state.safePlace = document.getElementById("safe-place").value.trim();
+        state.simpleHome = document.getElementById("simple-home").checked;
+        save();
+        closeDialog();
+        render();
+      }
+      function saveItem(index) {
+        var titleField = document.getElementById("activity-title");
+        var timeField = document.getElementById("activity-time");
+        var title = titleField.value.trim();
+        titleField.setCustomValidity("");
+        timeField.setCustomValidity("");
+        if (!title) { titleField.focus(); titleField.setCustomValidity("Vul een activiteit in."); titleField.reportValidity(); return; }
+        if (!timeField.value) { timeField.focus(); timeField.reportValidity(); return; }
+        var oldReminderId = index >= 0 && state.plan[index] ? state.plan[index].reminderId || "" : "";
+        var item;
+        if (index >= 0 && state.plan[index]) {
+          item = state.plan[index];
+          item.title = title;
+          item.time = timeField.value;
+          item.place = document.getElementById("activity-place").value.trim();
+          item.person = document.getElementById("activity-person").value.trim();
+          item.note = document.getElementById("activity-note").value.trim();
+          item.reminder = Number(document.getElementById("activity-reminder").value);
+        } else {
+          item = {
+            title: title,
+            time: timeField.value,
+            place: document.getElementById("activity-place").value.trim(),
+            person: document.getElementById("activity-person").value.trim(),
+            note: document.getElementById("activity-note").value.trim(),
+            reminder: Number(document.getElementById("activity-reminder").value),
+            done: false
+          };
+          state.plan.push(item);
+          state.example = false;
+        }
+        item.reminderId = item.reminder > 0 ? reminderId(item) : "";
+        state.plan.sort(function (a, b) { return String(a.time).localeCompare(String(b.time)); });
+        save();
+        scheduleEventReminder(item, oldReminderId);
+        closeDialog();
+        render();
+      }
+      function reminderId(item) {
+        return "sw-" + state.selectedDate + "-" + item.time + "-" + item.title;
+      }
+      function scheduleEventReminder(item, oldReminderId) {
+        if (!window.NativeApp) return;
+        if (oldReminderId && oldReminderId !== item.reminderId && window.NativeApp.cancelReminder) {
+          window.NativeApp.cancelReminder(oldReminderId);
+        }
+        if (!item.reminder || item.done || !window.NativeApp.scheduleReminder) {
+          if (item.reminderId && window.NativeApp.cancelReminder) window.NativeApp.cancelReminder(item.reminderId);
+          return;
+        }
+        var trigger = new Date(state.selectedDate + "T" + item.time + ":00").getTime() - Number(item.reminder) * 60000;
+        if (trigger <= Date.now()) {
+          if (window.NativeApp.cancelReminder) window.NativeApp.cancelReminder(item.reminderId);
+          return;
+        }
+        window.NativeApp.scheduleReminder(item.reminderId, item.title, trigger, Number(item.reminder));
+      }
+      function shareCard() {
+        var text = helpCardText();
+        closeDialog();
+        if (window.NativeApp && window.NativeApp.shareText) window.NativeApp.shareText(text);
+        else if (navigator.share) navigator.share({ title: "Mijn hulpkaart", text: text }).catch(function () {});
+        else setStatus("Delen kan via de deelopties van je telefoon.");
+      }
+      function helpCardText() {
+        var text = "Mijn hulpkaart — " + name() + "\n\nIk heb extra tijd nodig. Praat rustig en gebruik korte zinnen. Vertel stap voor stap wat er gaat gebeuren.";
+        if (state.earlySigns.trim()) text += "\n\nIk merk spanning aan: " + state.earlySigns.trim();
+        if (state.calmingPlan.trim()) text += "\n\nDit helpt mij: " + state.calmingPlan.trim();
+        if (state.safePlace.trim()) text += "\n\nMijn rustige plek is: " + state.safePlace.trim();
+        if (state.note.trim()) text += "\n\nDit helpt mij ook: " + state.note.trim();
+        getContacts().forEach(function (contact) {
+          text += "\n\nMijn vertrouwde contact: " + (contact.name || "Vertrouwd contact") + (contact.phone ? " — " + contact.phone : "");
+        });
+        return text;
+      }
+      function go(pageName) {
+        if (pageName === "today") selectDate(dayKey());
+        page = pageName; taskIndex = -1; selectedNeed = ""; render();
+      }
+      function handleAction(action) {
+        var parts = action.split(":");
+        var name = parts[0];
+        var index = Number(parts[1]);
+        if (name === "go-day") return go("day");
+        if (name === "go-skills") return go("skills");
+        if (name === "go-together") return go("together");
+        if (name === "go-rest") return go("rest");
+        if (name === "date-prev") return shiftDate(-1);
+        if (name === "date-next") return shiftDate(1);
+        if (name === "date-today") return selectDate(dayKey());
+        if (name === "copy-prev") return copyPreviousPlan();
+        if (name === "add-item") return showRoutineDialog(-1);
+        if (name === "edit-item") return showRoutineDialog(index);
+        if (name === "delete-item") return showDeleteDialog(index);
+        if (name === "confirm-delete") {
+          if (deleteIndex >= 0) {
+            var removed = state.plan[deleteIndex];
+            if (removed && removed.reminderId && window.NativeApp && window.NativeApp.cancelReminder)
+              window.NativeApp.cancelReminder(removed.reminderId);
+            state.plan.splice(deleteIndex, 1);
+          }
+          state.example = false; save(); closeDialog(); return render();
+        }
+        if (name === "save-item") return saveItem(index);
+        if (name === "close-dialog") return closeDialog();
+        if (name === "save-settings") return saveSettings();
+        if (name === "complete-onboarding") return completeOnboarding();
+        if (name === "export-preview") return showExportPreview();
+        if (name === "export-data") return exportData();
+        if (name === "reset-confirm") return showResetConfirmation();
+        if (name === "reset-data") {
+          if (window.NativeApp && window.NativeApp.cancelReminder) {
+            Object.keys(state.plans).forEach(function (date) {
+              (state.plans[date] || []).forEach(function (item) {
+                if (item.reminderId) window.NativeApp.cancelReminder(item.reminderId);
+              });
+            });
+          }
+          localStorage.removeItem(STORAGE_KEY);
+          window.location.reload();
+          return;
+        }
+        if (name === "toggle-item" && state.plan[index]) {
+          state.plan[index].done = !state.plan[index].done;
+          scheduleEventReminder(state.plan[index]);
+          save(); return render();
+        }
+        if ((name === "move-up" || name === "move-down") && state.plan[index]) {
+          var destination = index + (name === "move-up" ? -1 : 1);
+          if (destination >= 0 && destination < state.plan.length) {
+            var moved = state.plan.splice(index, 1)[0]; state.plan.splice(destination, 0, moved);
+            state.example = false; save(); return render();
+          }
+        }
+        if (name === "start-task") { taskIndex = index; stepIndex = 0; return render(); }
+        if (name === "next-step") { stepIndex += 1; return render(); }
+        if (name === "prev-step") { stepIndex -= 1; return render(); }
+        if (name === "finish-task" || name === "stop-task") {
+          taskIndex = -1; stepIndex = 0; return render();
+        }
+        if (name === "mood") {
+          state.mood = parts.slice(1).join(":"); state.moodDay = state.selectedDate;
+          state.moodHistory = (state.moodHistory || []).filter(function (entry) { return entry.date !== state.selectedDate; });
+          state.moodHistory.push({ date: state.selectedDate, mood: state.mood });
+          state.moodHistory = state.moodHistory.slice(-90);
+          save(); return render();
+        }
+        if (name === "need") { selectedNeed = parts[1]; return render(); }
+        if (name === "signal") {
+          var choices = ["Geluid voelt hard", "Licht is fel", "Veel mensen om mij heen", "Mijn planning is veranderd", "Ik ben moe", "Mijn lichaam voelt onrustig"];
+          var signal = choices[index];
+          if (signal) {
+            var signalIndex = state.sensorySignals.indexOf(signal);
+            if (signalIndex >= 0) state.sensorySignals.splice(signalIndex, 1);
+            else state.sensorySignals.push(signal);
+            save(); return render();
+          }
+        }
+        if (name === "start-breath") return showBreathing();
+        if (name === "grounding") return showGrounding();
+        if (name === "ground-next") { groundStep += 1; return renderGroundingDialog(); }
+        if (name === "ground-prev") { groundStep = Math.max(0, groundStep - 1); return renderGroundingDialog(); }
+        if (name === "add-custom-task") return showTaskEditor(-1);
+        if (name === "custom-editor") return showTaskEditor(index);
+        if (name === "edit-custom-task") return showTaskEditor(index);
+        if (name === "save-custom-task") return saveCustomTask(index);
+        if (name === "delete-custom-task") {
+          openDialog("Stappenplan verwijderen?", "<p>Wil je dit eigen stappenplan verwijderen?</p>" +
+            btn("Ja, verwijder", "delete-custom-confirm:" + index, true) + btn("Annuleer", "close-dialog", false)); return;
+        }
+        if (name === "delete-custom-confirm") {
+          state.customTasks.splice(index, 1); taskIndex = -1; save(); closeDialog(); return render();
+        }
+        if (name === "add-goal") return showGoalDialog();
+        if (name === "save-goal") return saveGoal();
+        if (name === "set-budget") return showBudgetDialog();
+        if (name === "save-budget") return saveBudget();
+        if (name === "add-expense") return showExpenseDialog();
+        if (name === "save-expense") return saveExpense();
+        if (name === "delete-expense") {
+          openDialog("Uitgave verwijderen?", "<p>Wil je deze uitgave uit je overzicht halen?</p>" +
+            btn("Ja, verwijder", "delete-expense-confirm:" + index, true) + btn("Annuleer", "close-dialog", false)); return;
+        }
+        if (name === "delete-expense-confirm") { state.expenses.splice(index, 1); save(); closeDialog(); return render(); }
+        if (name === "toggle-goal" && state.goals[index]) {
+          state.goals[index].done = !state.goals[index].done; save(); return render();
+        }
+        if (name === "delete-goal" && state.goals[index]) {
+          openDialog("Doel verwijderen?", "<p>Wil je dit doel verwijderen?</p>" +
+            btn("Ja, verwijder", "delete-goal-confirm:" + index, true) + btn("Annuleer", "close-dialog", false)); return;
+        }
+        if (name === "delete-goal-confirm") { state.goals.splice(index, 1); save(); closeDialog(); return render(); }
+        if (name === "share-preview") return showSharePreview();
+        if (name === "phrase") return showPhrase(index);
+        if (name === "speak-phrase") {
+          var phrase = communicationPhrases()[index];
+          if (phrase && window.NativeApp && window.NativeApp.speakText) window.NativeApp.speakText(phrase);
+          return;
+        }
+        if (name === "speak-step" && window.NativeApp && window.NativeApp.speakText && taskIndex >= 0) {
+          var activeTask = allTasks()[taskIndex];
+          if (activeTask && activeTask.steps[stepIndex]) window.NativeApp.speakText(activeTask.steps[stepIndex]);
+          return;
+        }
+        if (name === "speak-help" && window.NativeApp && window.NativeApp.speakText) {
+          window.NativeApp.speakText(helpCardText()); return;
+        }
+        if (name === "settings") return showSettings();
+        if (name === "share") return shareCard();
+        if (name === "dial") {
+          var contactIndex = Number(parts[1] || 0);
+          var contact = getContacts()[contactIndex];
+          if (contact && contact.phone && window.NativeApp && window.NativeApp.dial) window.NativeApp.dial(contact.phone);
+          return;
+        }
+      }
+      document.addEventListener("click", function (event) {
+        var pageButton = event.target.closest("[data-page]");
+        if (pageButton) { go(pageButton.dataset.page); return; }
+        var actionButton = event.target.closest("[data-action]");
+        if (actionButton) handleAction(actionButton.dataset.action);
+      });
+      document.addEventListener("change", function (event) {
+        if (event.target && event.target.id === "plan-date") selectDate(event.target.value);
+        if (event.target && event.target.id === "skill-category") {
+          selectedSkillCategory = event.target.value; render();
+        }
+      });
+      document.addEventListener("input", function (event) {
+        if (!event.target || event.target.id !== "task-search") return;
+        taskSearch = event.target.value;
+        var query = taskSearch.trim().toLowerCase();
+        document.querySelectorAll("[data-task-card]").forEach(function (taskCard) {
+          taskCard.hidden = query && taskCard.dataset.taskTitle.indexOf(query) < 0;
+        });
+      });
+      document.getElementById("settings-open").addEventListener("click", showSettings);
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && document.querySelector(".overlay")) closeDialog();
+      });
+      window.samenwijsBack = function () {
+        if (document.querySelector(".overlay")) { closeDialog(); return true; }
+        if (page !== "today") { go("today"); return true; }
+        return false;
+      };
+      applyPreferences();
+      save();
+      render();
+      if (!state.onboarded) showWelcome();
+    })();
+  </script>
+</body>
+</html>
